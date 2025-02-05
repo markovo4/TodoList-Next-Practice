@@ -1,5 +1,5 @@
 export default function Home() {
   return (
-      <p>DashBoard</p>
+      <p className='text-center'>Dashboard</p>
   );
 }
