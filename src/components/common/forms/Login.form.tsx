@@ -15,7 +15,9 @@ type initialValuesTypes = {
 
 export const LoginForm = ()=>{
     const [formValues, setFormValues] = useState<initialValuesTypes>(initialValues)
+    const [isHidden, setIsHidden] = useState<boolean>(true)
 
+    
     const formData = useForm()
     const {watch} = formData;
     const email = watch('email')
@@ -31,8 +33,8 @@ export const LoginForm = ()=>{
             <div className='flex justify-center bg-blue-100 rounded-md shadow-blue-500 shadow-md p-10'>
                 <form className={'flex flex-col gap-3'}>
                     <FormInput value={email} onChange={handleChange} label={'E-mail'} id={'email'} type={'text'} name={'email'}/>
-                    <FormInput value={password} onChange={handleChange} label={'Password'} id={'password'} type={'password'} name={'password'}/>
-                </form>
+                    <FormInput id={'password'} label={'Password'} name={'password'} onChange={handleChange}
+                               type={'password'} value={password} isHidden={isHidden} showPassword={setIsHidden}/>                </form>
             </div>
         </div>
     )

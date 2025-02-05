@@ -1,5 +1,7 @@
-import React, {FC} from "react";
+import React, {Dispatch, FC, SetStateAction} from "react";
 import clsx from "clsx";
+import {EyeClosedIcon} from "@/styles/tsx-icons/form-icons/eyeClosed.icon";
+import {EyeOpenedIcon} from "@/styles/tsx-icons/form-icons/eyeOpened.icon";
 
 export const FormInput: FC<InputProps> = ({
                                                    value,
@@ -8,10 +10,12 @@ export const FormInput: FC<InputProps> = ({
                                                    id,
                                                    type,
                                                    name,
-                                                   label
+                                                   label,
+                                                    isHidden = true,
+                                                    showPassword
                                                }) => {
     return (
-        <div className="flex flex-col h-[55px] ">
+        <div className="flex flex-col h-[55px] relative ">
             <div className={clsx(
                 errorMessage ? "border-2 border-red-600 rounded-lg" : "rounded-lg"
             )}>
@@ -22,7 +26,7 @@ export const FormInput: FC<InputProps> = ({
                             ? "border-red-500 focus:border-red-600" // Red border when there's an error
                             : "border-gray-300 focus:border-blue-500" // Default border color
                     )}
-                    type={type}
+                    type={isHidden ? type : 'text'}
                     id={id}
                     name={name}
                     value={value}
@@ -30,6 +34,12 @@ export const FormInput: FC<InputProps> = ({
                     placeholder={label}
                 />
             </div>
+
+            {showPassword && <button className='absolute text-black bg-blue-100 border-2 border-transparent rounded-e-sm w-[32px] h-[32px] right-0.5 top-0.5 flex justify-center items-center'
+            onClick={(e) => {e.preventDefault(); showPassword(!isHidden)}}
+            >
+                {isHidden ? <EyeClosedIcon height={22} width={25}/> : <EyeOpenedIcon height={36} width={36}/>}
+            </button>}
 
             {errorMessage && (
                 <small className="text-red-600 font-medium text-xs mt-0.5 ml-1">
@@ -48,4 +58,6 @@ export type InputProps = {
     id: string;
     type: string;
     name: string;
+    showPassword?: Dispatch<SetStateAction<boolean>>;
+    isHidden?: boolean;
 };

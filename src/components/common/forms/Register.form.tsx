@@ -26,6 +26,7 @@ export const RegisterForm = ()=>{
     const password = watch('password');
 
     const [formValues, setFormValues] = useState<initialFormTypes>(initialFormValues);
+    const [isHidden, setIsHidden] = useState<boolean>(true)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const {name, value} = e.target;
@@ -43,7 +44,7 @@ export const RegisterForm = ()=>{
                     <FormInput id={'email'} label={'E-mail'} name={'email'} onChange={handleChange} type={'text'}
                                value={email}/>
                     <FormInput id={'password'} label={'Password'} name={'password'} onChange={handleChange}
-                               type={'password'} value={password}/>
+                               type={'password'} value={password} isHidden={isHidden} showPassword={setIsHidden}/>
                 </form>
             </div>
         </div>
