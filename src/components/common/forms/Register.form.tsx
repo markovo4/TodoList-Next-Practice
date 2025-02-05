@@ -1,7 +1,7 @@
 'use client'
-import {FormInput} from "@/components/common/inputs/FormInput";
 import {useForm} from "react-hook-form";
 import React, {useState} from "react";
+import {FormInput} from "@/components/common/inputs/FormInput";
 
 const initialFormValues={
     name: '',
@@ -32,11 +32,20 @@ export const RegisterForm = ()=>{
         setFormValues({...formValues, [name]: value})
     }
     return(
-        <form>
-            <FormInput id={'name'} label={'Name'} name={'name'} onChange={handleChange} type={'text'} value={name}/>
-            <FormInput id={'lastName'} label={'Lastname'} name={'lastName'} onChange={handleChange} type={'text'} value={lastName}/>
-            <FormInput id={'email'} label={'E-mail'} name={'email'} onChange={handleChange} type={'text'} value={email}/>
-            <FormInput id={'password'} label={'Password'} name={'password'} onChange={handleChange} type={'password'} value={password}/>
-        </form>
+        <div className={'w-[350px] mx-auto'}>
+            <div className='flex justify-center bg-blue-100 shadow-blue-500 shadow-md p-10 rounded-md'>
+                <form className={'flex flex-col gap-3'}>
+                    <FormInput id={'name'} label={'Name'} name={'name'} onChange={handleChange} type={'text'}
+                               value={name}/>
+                    <FormInput id={'lastName'} label={'Lastname'} name={'lastName'} onChange={handleChange}
+                               type={'text'}
+                               value={lastName}/>
+                    <FormInput id={'email'} label={'E-mail'} name={'email'} onChange={handleChange} type={'text'}
+                               value={email}/>
+                    <FormInput id={'password'} label={'Password'} name={'password'} onChange={handleChange}
+                               type={'password'} value={password}/>
+                </form>
+            </div>
+        </div>
     )
 }
