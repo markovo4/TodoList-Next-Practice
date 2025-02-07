@@ -6,7 +6,6 @@ import {regUser} from "@/app/api/actions";
 import {SubmitButton} from "@/components/common/buttons/SubmitButton";
 import {useRouter} from "next/navigation";
 import {toast, TypeOptions} from "react-toastify";
-import {setCookie} from "cookies-next";
 
 const initialFormValues={
     name: '',
@@ -48,8 +47,7 @@ export const RegisterForm = ()=>{
         }
 
         if (state?.redirect) {
-            setCookie
-            // return router.push(state.redirect);
+            return router.push(state.redirect);
         }
 
     }, [pending, state]);
