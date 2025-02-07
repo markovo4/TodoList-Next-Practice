@@ -1,3 +1,4 @@
+'use client'
 import {Api} from "@/lib/api";
 import {registerValidationSchema} from "@/utils/validationSchemas/register.validationSchema";
 import {z} from "zod";
@@ -57,39 +58,43 @@ export const regUser = async (_prevState: unknown, data: FormData)=>{
     }
 }
 
-export const logUser = async (_prevState: unknown, data: FormData)=>{
+export const logUser = async (_prevState: unknown, data: FormData)=> {
     const {email, password} = Object.fromEntries(data.entries()) as Record<string, string>;
 
-    try{
+    try {
         const validatedData = loginValidationSchema.parse({email, password})
         const response = await Api.post('/api/auth/login', validatedData);
 
-        if(response.status === 200){
+        if (response.status === 200) {
             const token = response.data.token;
-            const userId = response.data.userId;
+            const userId = response.data.user.id;
+            const isTwoFa = response.data.user.twoFa;
 
-            setCookie("session", token, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 60 * 60, // 1 hour
-            });
+            if (!isTwoFa) {
+                setCookie("session", token, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 60 * 60, // 1 hour
+                });
+            }
             setCookie("userId", userId, {
                 httpOnly: false,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
-                maxAge: 60 * 60, // 1 hour
+                maxAge: 300, // 5 minutes
             });
+
             return {
                 toastMessage: "Successful Login",
                 toastStatus: "success",
-                redirect: "/auth/setup-two-factor",
+                redirect: `${isTwoFa ? "/auth/setup-two-factor" : "/auth/setup-two-factor"}`,
             };
         }
 
 
-    }catch(error){
-        if(error instanceof z.ZodError){
+    } catch (error) {
+        if (error instanceof z.ZodError) {
             const errors = error.flatten().fieldErrors;
             return {
                 email: errors.email?.[0] || undefined,
@@ -119,3 +124,28 @@ export const logUser = async (_prevState: unknown, data: FormData)=>{
         };
     }
 }
+
+    export const subscribeTwoFactor = async (_prevState: unknown, data: FormData)=> {
+        const {twoFa, id} = Object.fromEntries(data.entries()) as Record<string, string>;
+
+        try {
+            const response = await Api.put('/api/auth/two-factor/subscribe', {userId: id, secret: twoFa});
+            if (response.status === 200) {
+                return {
+                    toastMessage: "Successful Login",
+                    toastStatus: "success",
+                    redirect: `/`,
+                };
+            }
+
+        } catch (error) {
+
+            return {
+                email: undefined,
+                password: undefined,
+                toastMessage: "Unexpected server error occurred!",
+                toastStatus: 'error',
+                redirect: null
+            };
+        }
+    }

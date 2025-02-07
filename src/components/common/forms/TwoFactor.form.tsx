@@ -2,33 +2,47 @@
 import {SubmitButton} from "@/components/common/buttons/SubmitButton";
 import {useGetSecretKeyQuery} from "@/utils/query/useGetSecretKey.query";
 import {getCookie} from "cookies-next";
-import {useState} from "react";
+import React, {useActionState, useState} from "react";
 import {QRCodeCanvas} from "qrcode.react";
 import {copyToClipboard} from "@/utils/functions/copyToClipboard";
 import {CopyIcon} from "@/styles/tsx-icons/common-icons/copy.icon";
 import {FormInput} from "@/components/common/inputs/FormInput";
 import {useForm} from "react-hook-form";
+import {subscribeTwoFactor} from "@/app/api/actions";
 
 export const TwoFactorForm = () => {
     const { mutateAsync: getSecretKey, isPending } = useGetSecretKeyQuery();
-    const userId =  getCookie('userId')
+    const userId =   getCookie('userId')
     const [qrCode, setQrCode] = useState<QrCodeType>()
 
+    const [state, action, pending] = useActionState(subscribeTwoFactor, null);
     const formData = useForm();
-    const {watch} = formData;
+    const {setValue, watch} = formData;
     const twoFa = watch('toFa');
+    const id = watch('id');
+
+
 
     const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         try {
             const secretKey = await getSecretKey(userId);
+            console.log(secretKey)
 
-            setQrCode(secretKey?.data.secret)
+            setQrCode((secretKey.secret as unknown as QrCodeType))
         } catch (error) {
             console.error("Failed to fetch secret key:", error);
         }
     };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
+            const { value } = e.target;
+
+            setValue("toFa", value);
+            setValue("id", userId);
+
+    }
 
     return (
         <div className="w-[400px] mx-auto">
@@ -48,7 +62,12 @@ export const TwoFactorForm = () => {
                                 <CopyIcon width={15} height={15}/>
                             </button>
                         </div>
-                        <FormInput value={twoFa} onChange={} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
+                        <form action={action}>
+                            <FormInput value={twoFa} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
+                            <input name={'id'} id={'id'} value={id} className={'hidden'}/>
+                            <SubmitButton title={'Subscribe'} disabled={pending}/>
+                        </form>
+
 
                     </div>}
             </div>

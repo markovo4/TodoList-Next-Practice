@@ -1,6 +1,6 @@
 const cofactor = require('node-2fa');
 
-export const subscribeTwoFactorAuth = ({ name, account }: { name: string, account: string }) => {
+export const subscribeTotp = ({ name, account }: { name: string, account: string }) => {
     try {
         const secret = cofactor.generateSecret({ name, account });
 
@@ -18,3 +18,9 @@ export const subscribeTwoFactorAuth = ({ name, account }: { name: string, accoun
         return null;
     }
 };
+
+
+export const verifyTotp = ({secret, userCode}: {secret: string | null, userCode: string})=>{
+    const result = cofactor.verifyToken(secret, userCode);
+    return result !== null && result.delta !== undefined
+}

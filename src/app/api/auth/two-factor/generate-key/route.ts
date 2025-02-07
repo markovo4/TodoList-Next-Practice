@@ -1,25 +1,25 @@
 import {prisma} from '@/lib/prisma';
 import {NextRequest, NextResponse} from "next/server";
-import {subscribeTwoFactorAuth} from "@/lib/twoFactor";
+import {subscribeTotp} from "@/lib/twoFactor";
 
 export const POST = async(req: NextRequest)=>{
     const body = await req.json();
     const {userId} = body;
     try{
-        const userEmail = await prisma.user.findFirst({
+        const user = await prisma.user.findFirst({
             where: {id: userId}
         })
 
-        if(!userEmail){
+        if(!user){
             return NextResponse.json(
                 { toastMessage: "Invalid user credentials!", toastStatus: "error" },
                 {status: 404}
             )
         }
 
-        const secret = subscribeTwoFactorAuth({
+        const secret = subscribeTotp({
             name: 'Todo App',
-            account: userEmail.email
+            account: user.email
         })
 
         if(!secret){
@@ -35,7 +35,6 @@ export const POST = async(req: NextRequest)=>{
         )
 
     }catch (error){
-        console.error(error)
         return NextResponse.json(
             {toastMessage: "Server error", toastStatus: "error" },
             {status: 500}
