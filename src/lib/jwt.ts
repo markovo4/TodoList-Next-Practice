@@ -8,7 +8,7 @@ export const generateToken = (payload: {userId: string}): string => {
 
 export const verifyJWT = (token: string)=>{
     try {
-        jwt.verify(token, (SECRET_KEY as string))
+        return jwt.verify(token, (SECRET_KEY as string))
     } catch (error) {
         return null;
     }

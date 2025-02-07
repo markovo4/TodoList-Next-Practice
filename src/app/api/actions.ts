@@ -66,8 +66,15 @@ export const logUser = async (_prevState: unknown, data: FormData)=>{
 
         if(response.status === 200){
             const token = response.data.token;
+            const userId = response.data.userId;
 
             setCookie("session", token, {
+                httpOnly: false,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                maxAge: 60 * 60, // 1 hour
+            });
+            setCookie("userId", userId, {
                 httpOnly: false,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
@@ -76,7 +83,7 @@ export const logUser = async (_prevState: unknown, data: FormData)=>{
             return {
                 toastMessage: "Successful Login",
                 toastStatus: "success",
-                redirect: "/",
+                redirect: "/auth/setup-two-factor",
             };
         }
 

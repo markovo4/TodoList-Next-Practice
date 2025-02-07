@@ -6,6 +6,7 @@ export const POST = async (req: NextRequest) => {
     try {
         const body = await req.json();
         const { email, password } = body;
+        console.log({body})
 
         // Validate request body
         if (!email || !password) {
@@ -32,7 +33,7 @@ export const POST = async (req: NextRequest) => {
 
         // Create new user
         const user = await prisma.user.create({
-            data: { ...body, password: hashedPassword },
+            data: { ...body, password: hashedPassword, twoFa: false },
         });
 
         return NextResponse.json(

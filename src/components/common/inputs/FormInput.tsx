@@ -16,9 +16,6 @@ export const FormInput: FC<InputProps> = ({
                                                }) => {
     return (
         <div className="flex flex-col h-[55px] relative ">
-            <div className={clsx(
-                errorMessage ? "border-2 border-red-600 rounded-lg" : "rounded-lg"
-            )}>
                 <input
                     className={clsx(
                         "border-2 rounded-md bg-white text-black px-3 py-1 outline-none", // Always have a border
@@ -33,7 +30,6 @@ export const FormInput: FC<InputProps> = ({
                     onChange={onChange}
                     placeholder={label}
                 />
-            </div>
 
             {showPassword && <button className='absolute text-black bg-blue-100 border-2 border-transparent rounded-e-sm w-[32px] h-[32px] right-0.5 top-0.5 flex justify-center items-center'
             onClick={(e) => {e.preventDefault(); showPassword(!isHidden)}}
