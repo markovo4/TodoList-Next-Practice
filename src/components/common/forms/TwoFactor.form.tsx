@@ -2,28 +2,21 @@
 import {SubmitButton} from "@/components/common/buttons/SubmitButton";
 import {useGetSecretKeyQuery} from "@/utils/query/useGetSecretKey.query";
 import {getCookie} from "cookies-next";
-import React, {useActionState, useState} from "react";
+import React, {useState} from "react";
 import {QRCodeCanvas} from "qrcode.react";
 import {copyToClipboard} from "@/utils/functions/copyToClipboard";
 import {CopyIcon} from "@/styles/tsx-icons/common-icons/copy.icon";
 import {FormInput} from "@/components/common/inputs/FormInput";
-import {useForm} from "react-hook-form";
-import {subscribeTwoFactor} from "@/app/api/actions";
+import {useSubscribeTwoFactorQuery} from "@/utils/query/useSubscribeTwoFactor.query";
 
 export const TwoFactorForm = () => {
     const { mutateAsync: getSecretKey, isPending } = useGetSecretKeyQuery();
+    const { mutateAsync: subscribeTwoFactor, isPending: isConfirmed } = useSubscribeTwoFactorQuery();
     const userId =   getCookie('userId')
     const [qrCode, setQrCode] = useState<QrCodeType>()
+const [secretkey, setSecretKey] = useState('')
 
-    const [state, action, pending] = useActionState(subscribeTwoFactor, null);
-    const formData = useForm();
-    const {setValue, watch} = formData;
-    const twoFa = watch('toFa');
-    const id = watch('id');
-
-
-
-    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSpawnKey = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         try {
@@ -36,18 +29,26 @@ export const TwoFactorForm = () => {
         }
     };
 
+    const handleConfirmKey = async(e: React.MouseEvent<HTMLButtonElement>)=>{
+        e.preventDefault();
+
+        try {
+            const response = await subscribeTwoFactor({userId, secret: secretkey});
+            console.log(response)
+        } catch (error) {
+            console.error("Failed to fetch secret key:", error);
+        }
+    }
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
             const { value } = e.target;
-
-            setValue("toFa", value);
-            setValue("id", userId);
-
+        setSecretKey(value)
     }
 
     return (
         <div className="w-[400px] mx-auto">
             <div className="flex flex-col bg-blue-100 rounded-md shadow-blue-500 shadow-md p-10">
-                <SubmitButton title="Enable 2-FA" disabled={isPending} action={handleClick} />
+                <SubmitButton title="Enable 2-FA" disabled={isPending} action={handleSpawnKey} />
 
                 {qrCode?.qr &&
                     <div className='flex items-start gap-5 p-5 rounded-md shadow shadow-gray-950 w-[100%] bg-white mx-auto mt-10'>
@@ -62,13 +63,8 @@ export const TwoFactorForm = () => {
                                 <CopyIcon width={15} height={15}/>
                             </button>
                         </div>
-                        <form action={action}>
-                            <FormInput value={twoFa} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
-                            <input name={'id'} id={'id'} value={id} className={'hidden'}/>
-                            <SubmitButton title={'Subscribe'} disabled={pending}/>
-                        </form>
-
-
+                            <FormInput value={secretkey} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
+                            <SubmitButton title={'Subscribe'} disabled={isConfirmed} action={handleConfirmKey} />
                     </div>}
             </div>
         </div>

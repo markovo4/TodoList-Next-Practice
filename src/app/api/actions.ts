@@ -82,7 +82,7 @@ export const logUser = async (_prevState: unknown, data: FormData)=> {
                 httpOnly: false,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "strict",
-                maxAge: 300, // 5 minutes
+                maxAge: 300,
             });
 
             return {
@@ -125,27 +125,3 @@ export const logUser = async (_prevState: unknown, data: FormData)=> {
     }
 }
 
-    export const subscribeTwoFactor = async (_prevState: unknown, data: FormData)=> {
-        const {twoFa, id} = Object.fromEntries(data.entries()) as Record<string, string>;
-
-        try {
-            const response = await Api.put('/api/auth/two-factor/subscribe', {userId: id, secret: twoFa});
-            if (response.status === 200) {
-                return {
-                    toastMessage: "Successful Login",
-                    toastStatus: "success",
-                    redirect: `/`,
-                };
-            }
-
-        } catch (error) {
-
-            return {
-                email: undefined,
-                password: undefined,
-                toastMessage: "Unexpected server error occurred!",
-                toastStatus: 'error',
-                redirect: null
-            };
-        }
-    }
