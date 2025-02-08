@@ -7,7 +7,6 @@ export const SubmitButton: FC<SubmitButtonProps> = ({ title, disabled, action})=
         if(action){
             action(e);
         }
-        console.log(1)
     }
     return(
         <div>

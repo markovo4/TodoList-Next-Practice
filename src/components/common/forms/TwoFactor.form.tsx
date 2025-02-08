@@ -4,11 +4,12 @@ import {useGetSecretKeyQuery} from "@/utils/query/useGetSecretKey.query";
 import {getCookie} from "cookies-next";
 import React, {useState} from "react";
 import {QRCodeCanvas} from "qrcode.react";
-import {copyToClipboard} from "@/utils/functions/copyToClipboard";
-import {CopyIcon} from "@/styles/tsx-icons/common-icons/copy.icon";
-import {FormInput} from "@/components/common/inputs/FormInput";
 import {useSubscribeTwoFactorQuery} from "@/utils/query/useSubscribeTwoFactor.query";
 import {useRouter} from "next/navigation";
+import {FormInput} from "@/components/common/inputs/FormInput";
+import {copyToClipboard} from "@/utils/functions/copyToClipboard";
+import {CopyIcon} from "@/styles/tsx-icons/common-icons/copy.icon";
+import {truncate} from "@/utils/functions/truncate";
 
 export const TwoFactorForm = () => {
     const { mutateAsync: getSecretKey, isPending } = useGetSecretKeyQuery();
@@ -23,7 +24,6 @@ const [secretKey, setSecretKey] = useState('')
 
         try {
             const secretKey = await getSecretKey(userId);
-            console.log(secretKey)
 
             setQrCode((secretKey.secret as unknown as QrCodeType))
         } catch (error) {
@@ -36,7 +36,7 @@ const [secretKey, setSecretKey] = useState('')
 
         try {
             const response = await subscribeTwoFactor({userId, secret: secretKey});
-            console.log(response)
+
             router.push('/auth/two-factor/verify')
 
         } catch (error) {
@@ -55,20 +55,31 @@ const [secretKey, setSecretKey] = useState('')
                 <SubmitButton title="Enable 2-FA" disabled={isPending} action={handleSpawnKey} />
 
                 {qrCode?.qr &&
-                    <div className='flex items-start gap-5 p-5 rounded-md shadow shadow-gray-950 w-[100%] bg-white mx-auto mt-10'>
-                        <QRCodeCanvas value={`${qrCode.qr || undefined}`}
-                                      size={100}
-                                      bgColor="#fff"
-                                      fgColor="#000000"/>
-                        <div className='flex justify-center items-center gap-3'>
-                        <p className='text-gray-500'>Or copy the code</p>
-                            <button onClick={() => copyToClipboard(qrCode.secret)}
-                                    className={'p-0.5  rounded-sm border border-gray-200 '}>
-                                <CopyIcon width={15} height={15}/>
-                            </button>
+                    <div>
+                        <div className='flex mb-10 items-start gap-5 p-5 rounded-md shadow shadow-gray-950 w-[100%] bg-white mx-auto mt-10'>
+                            <QRCodeCanvas value={`${qrCode.uri || undefined}`}
+                                          size={100}
+                                          bgColor="#fff"
+                                          fgColor="#000000"/>
+                            <div className='flex flex-col gap-3'>
+                                <div className='flex gap-3'>
+                                    <p className='text-gray-500'>Or copy the code</p>
+                                    <button onClick={() => copyToClipboard(qrCode.secret)}
+                                            className={'p-0.5  rounded-sm border border-gray-200 bg-white'}>
+                                        <CopyIcon width={15} height={15}/>
+                                    </button>
+                                </div>
+
+                                <p className='text-indigo-500 text-sm'>{truncate(qrCode.secret)}</p>
+                            </div>
                         </div>
-                            <FormInput value={secretKey} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
+                        <div>
+                            <p className='text-gray-500 mb-1'>Please enter your copied secret key</p>
+                            <FormInput value={secretKey} onChange={handleChange} label={'Two-Factor secret key'}
+                                       id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
                             <SubmitButton title={'Subscribe'} disabled={isConfirmed} action={handleConfirmKey} />
+                        </div>
+
                     </div>}
             </div>
         </div>
@@ -78,4 +89,5 @@ const [secretKey, setSecretKey] = useState('')
 type QrCodeType = {
     qr: string;
     secret: string;
+    uri: string;
 }

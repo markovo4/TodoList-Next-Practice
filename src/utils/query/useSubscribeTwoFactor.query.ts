@@ -1,10 +1,10 @@
 import {Api} from "@/lib/api";
 import {useMutation} from "@tanstack/react-query";
+import {toast, TypeOptions} from "react-toastify";
 
 export const useSubscribeTwoFactorQuery = () => {
     return useMutation<SubscribeTwoFactorResponse, Error, SubscribeTwoFactorPayload>({
         mutationFn: async (payload) => {
-            console.log("Sending Request:", payload);
             return Api.put(`/api/auth/two-factor/subscribe`, payload)
                 .then((res) => res.data)
                 .catch((error) => {
@@ -13,10 +13,11 @@ export const useSubscribeTwoFactorQuery = () => {
                 });
         },
         onError: (error) => {
+            toast(`Mutation Error:${error}`, {type: 'error' as TypeOptions})
             console.error("Mutation Error:", error);
         },
-        onSuccess: (data) => {
-            console.log("Mutation Success:", data);
+        onSuccess: () => {
+            toast(`Two-Fa subscribed `, {type: 'success' as TypeOptions})
         },
     });
 };
