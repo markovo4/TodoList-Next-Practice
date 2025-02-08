@@ -8,13 +8,15 @@ import {copyToClipboard} from "@/utils/functions/copyToClipboard";
 import {CopyIcon} from "@/styles/tsx-icons/common-icons/copy.icon";
 import {FormInput} from "@/components/common/inputs/FormInput";
 import {useSubscribeTwoFactorQuery} from "@/utils/query/useSubscribeTwoFactor.query";
+import {useRouter} from "next/navigation";
 
 export const TwoFactorForm = () => {
     const { mutateAsync: getSecretKey, isPending } = useGetSecretKeyQuery();
     const { mutateAsync: subscribeTwoFactor, isPending: isConfirmed } = useSubscribeTwoFactorQuery();
+    const router = useRouter();
     const userId =   getCookie('userId')
     const [qrCode, setQrCode] = useState<QrCodeType>()
-const [secretkey, setSecretKey] = useState('')
+const [secretKey, setSecretKey] = useState('')
 
     const handleSpawnKey = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -33,8 +35,10 @@ const [secretkey, setSecretKey] = useState('')
         e.preventDefault();
 
         try {
-            const response = await subscribeTwoFactor({userId, secret: secretkey});
+            const response = await subscribeTwoFactor({userId, secret: secretKey});
             console.log(response)
+            router.push('/auth/two-factor/verify')
+
         } catch (error) {
             console.error("Failed to fetch secret key:", error);
         }
@@ -63,7 +67,7 @@ const [secretkey, setSecretKey] = useState('')
                                 <CopyIcon width={15} height={15}/>
                             </button>
                         </div>
-                            <FormInput value={secretkey} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
+                            <FormInput value={secretKey} onChange={handleChange} label={'Two-Factor code'} id={'twoFa'} type={'twoFa'} name={'twoFa'}/>
                             <SubmitButton title={'Subscribe'} disabled={isConfirmed} action={handleConfirmKey} />
                     </div>}
             </div>

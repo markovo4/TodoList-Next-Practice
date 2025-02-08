@@ -31,7 +31,7 @@ Api.interceptors.response.use(
     (response)=> response,
     (error)=>{
         if(error.response?.status === 401){
-            console.warn('Session expired, redirecting to login...')
+            console.warn('Session expired, redirecting to verify...')
         }
         return Promise.reject(error);
     }

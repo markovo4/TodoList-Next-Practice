@@ -75,20 +75,35 @@ export const logUser = async (_prevState: unknown, data: FormData)=> {
                     httpOnly: false,
                     secure: process.env.NODE_ENV === "production",
                     sameSite: "strict",
-                    maxAge: 60 * 60, // 1 hour
+                    maxAge: 60 * 60,
+                });
+
+                setCookie("userId", userId, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 60 * 60,
+                });
+            } else if(isTwoFa){
+                setCookie("session", token, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 300
+                });
+
+                setCookie("userId", userId, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 300
                 });
             }
-            setCookie("userId", userId, {
-                httpOnly: false,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: "strict",
-                maxAge: 300,
-            });
 
             return {
                 toastMessage: "Successful Login",
                 toastStatus: "success",
-                redirect: `${isTwoFa ? "/auth/setup-two-factor" : "/auth/setup-two-factor"}`,
+                redirect: `${isTwoFa ? "/auth/two-factor/verify" : "/"}`,
             };
         }
 

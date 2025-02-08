@@ -36,7 +36,7 @@ export const POST = async (req: NextRequest)=>{
         const token = generateToken({ userId: user.id });
 
         return NextResponse.json(
-            { token, userId: user.id, toastMessage: "Successful Login!", toastStatus: "success" },
+            { token, userId: user.id, toastMessage: "Successful Login!", toastStatus: "success", redirect: '/' },
             { status: 200 }
         );
 
