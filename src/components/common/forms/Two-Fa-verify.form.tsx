@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import {CodeInput} from "@/components/common/inputs/CodeInput";
 import {SubmitButton} from "@/components/common/buttons/SubmitButton";
 import {Api} from "@/lib/api";
-import {getCookie} from "cookies-next";
+import {getCookie, setCookie} from "cookies-next";
 import {toast, TypeOptions} from "react-toastify";
 import {useRouter} from "next/navigation";
 
@@ -61,8 +61,23 @@ export const TwoFaVerifyForm = ()=>{
             }
 
             if(response?.redirect){
+                setCookie("session", response?.token, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 60*60
+                });
+
+                setCookie("userId", userId, {
+                    httpOnly: false,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "strict",
+                    maxAge: 60*60
+                });
                 router.push(response?.redirect)
             }
+
+
 
         }catch (error){
             console.error(error)
